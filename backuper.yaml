@@ -14,4 +14,11 @@ spec:
             - name: backup-job
               image: backuper:latest
               imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: my-volume
+                  mountPath: /app/backupfolder
+          volumes:
+            - name: my-volume
+              persistentVolumeClaim:
+                claimName: my-pvc
           restartPolicy: OnFailure

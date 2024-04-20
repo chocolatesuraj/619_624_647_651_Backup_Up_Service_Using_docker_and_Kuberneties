@@ -5,11 +5,13 @@ metadata:
 spec:
   containers:
     - name: my-container
-      image: surajraao/docker-registry:latest
+      image: backuper:latest
+      imagePullPolicy: IfNotPresent
       volumeMounts:
         - name: data-volume
-          mountPath: /data
+          mountPath: /app/backupfolder
   volumes:
     - name: data-volume
       persistentVolumeClaim:
         claimName: my-pvc
+  restartPolicy: OnFailure

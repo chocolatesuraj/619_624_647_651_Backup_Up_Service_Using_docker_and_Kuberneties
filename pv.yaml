@@ -10,7 +10,7 @@ spec:
     - ReadWriteOnce
   storageClassName: standard
   hostPath:
-    path: /home/suraj/cloud/data
+    path: /Mount
 
 
 
