@@ -4,6 +4,7 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 import os
+from datetime import datetime
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -37,8 +38,16 @@ def upload_file(service, file_path, folder_id=None):
         file_metadata['parents'] = [folder_id]
 
     media = MediaFileUpload(file_path)
-    file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-    print('File ID: %s' % file.get('id'))
+    file = service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields='id',
+        supportsAllDrives=True,
+        uploadType='resumable'
+    ).execute()
+    # print('File ID: %s' % file.get('id'))
+    print("Uploaded folder at ",datetime.now())
+
 
 def main():
     creds = authenticate()
@@ -46,16 +55,17 @@ def main():
 
     # Find the folder ID where you want to upload the files (optional)
     folder_id = None
-    folder_name = 'Backup Folder Name'
+    folder_name = 'Backup Folder'
     results = service.files().list(q=f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false", fields="files(id)").execute()
     items = results.get('files', [])
     if items:
         folder_id = items[0]['id']
-    else:
+        service.files().delete(fileId=folder_id).execute()
+    # else:
         # Create the folder if it doesn't exist
-        folder_metadata = {'name': folder_name, 'mimeType': 'application/vnd.google-apps.folder'}
-        folder = service.files().create(body=folder_metadata, fields='id').execute()
-        folder_id = folder.get('id')
+    folder_metadata = {'name': folder_name, 'mimeType': 'application/vnd.google-apps.folder'}
+    folder = service.files().create(body=folder_metadata, fields='id').execute()
+    folder_id = folder.get('id')
 
     # Local directory to upload files from
     local_dir = './backupfolder'
