@@ -10,6 +10,7 @@ spec:
     spec:
       template:
         spec:
+          restartPolicy: OnFailure  # Add or correct this line
           containers:
             - name: backup-job
               image: backuper:latest
@@ -17,8 +18,12 @@ spec:
               volumeMounts:
                 - name: my-volume
                   mountPath: /app/backupfolder
+                - name: google-drive-credentials
+                  mountPath: /app/google_drive_credentials
           volumes:
             - name: my-volume
               persistentVolumeClaim:
                 claimName: my-pvc
-          restartPolicy: OnFailure
+            - name: google-drive-credentials
+              secret:
+                secretName: google-drive-credentials
